@@ -1,18 +1,24 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+#include "AsyncDelay.h"
+
+#include "Display\MatrixDisplay.h"
+
+#include "InputManager.h"
+
+#include "Pinout.h"
+
+#include "SnakeGame.h"
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(9600);
+  
+  MatrixDisplay::Init();
+  InputManager::Init();
+  SnakeGame::Init();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  SnakeGame::Update();
+  MatrixDisplay::Scan();
 }
