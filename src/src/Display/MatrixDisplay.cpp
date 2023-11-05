@@ -3,16 +3,18 @@
 #include "AsyncDelay.h"
 
 #include "Pinout.h"
+#include "Display\MatrixDisplay.h"
 
 namespace MatrixDisplay
 {
+
   int pic[8];
 
-  void Clear()
+  void Clear(bool state = false)
   {
     for (int i = 0; i < 8; i++)
     {
-      pic[i] = 0;
+      pic[i] = state ? 255 : 0;
     }
   }
 
@@ -73,6 +75,41 @@ namespace MatrixDisplay
     if (value < 0 || value > 255)
       return;
 
+
     pic[Y] = value;
+
+    Serial.print("Y: ");
+    Serial.print(Y);
+    Serial.print("Val: ");
+    Serial.println(value);
+  }
+
+  inline void PlayDropdownFade()
+  {
+    const int speed = 50;
+
+    AsyncDelay del;
+
+    for(int Y = 0; Y < 8; Y++)
+    {
+      SetLine(Y, 255);
+      del.start(speed, AsyncDelay::MILLIS);
+      while(!del.isExpired()) Scan();
+    }
+  }
+
+
+  void PlayAnimation(Animations anim)
+  {
+    switch (anim)
+    {
+      
+    case DropdownFade:
+    PlayDropdownFade();
+      break;
+    
+    default:
+      break;
+    }
   }
 }

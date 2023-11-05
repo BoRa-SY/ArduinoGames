@@ -14,29 +14,58 @@
 
 namespace SnakeGame
 {
+    bool gameOngoing = true;
 
-    const int speed = 50;
+    const int speed = 100;
 
     const Size GridSize = {8,8};
 
     int snakeCellCount = 4;
     Point Snake[64];
-
+    
+    Point FoodPoint;
 
 
     char direction = 'r';
 
     AsyncDelay mainDelay;
 
-    void Display()
+    void UpdateDisplay(bool playerLost = false)
     {
         MatrixDisplay::Clear();
+
+        if(playerLost)
+        {
+            MatrixDisplay::PlayAnimation(MatrixDisplay::DropdownFade);
+            return;
+        }
 
         for(int i = 0; i < snakeCellCount; i++)
         {
             Point p = Snake[i];
             MatrixDisplay::SetPixel(p.X, p.Y, true);
         }
+
+        MatrixDisplay::SetPixel(FoodPoint.X, FoodPoint.Y, true);
+    }
+
+
+    void createFood()
+    {
+        Point food = {random(0, GridSize.Width), random(0, GridSize.Height)};
+
+        for(int i = 0; i < snakeCellCount; i++)
+        {
+            Point snakeCell = Snake[i];
+
+            if(snakeCell.X == food.X && snakeCell.Y == food.Y)
+            {
+                createFood();
+                return;
+            }
+        }
+
+        FoodPoint = food;
     }
 
     void Init()
@@ -46,8 +75,12 @@ namespace SnakeGame
         Snake[2] = {1, 0};
         Snake[3] = {0, 0};
 
-        Display();
+        createFood();
+
+        UpdateDisplay();
+
         mainDelay.start(speed, AsyncDelay::MILLIS);
+
     }
 
 
@@ -74,6 +107,9 @@ namespace SnakeGame
         }
     }
 
+
+
+
     inline void MainLogic()
     {
         Point offset = getOffsetByDirection(direction);
@@ -82,23 +118,38 @@ namespace SnakeGame
 
         if(!IsInBounds(newHead))
         {
-            // Player Lost
+            gameOngoing = false;
+            UpdateDisplay(true);
+
             return;
         }
 
 
+        
+        Point lastCellPoint;
+
         for(int i = snakeCellCount - 1; i > 0; i--)
         {
             Snake[i] = Snake[i - 1];
+
+            if(i == snakeCellCount - 1) lastCellPoint = Snake[i];
         }
 
         Snake[0] = newHead;
 
-        Display();
+        if(newHead.X == FoodPoint.X && newHead.Y == FoodPoint.Y)
+        {
+            Snake[snakeCellCount] = lastCellPoint;
+            snakeCellCount++;
+            createFood();
+        }
+
+        UpdateDisplay();
     }
 
     void Update()
     {
+        if(!gameOngoing) return;
         char drc = InputManager::GetPressedDirection();
         if(drc != 'N') direction = drc;
 
