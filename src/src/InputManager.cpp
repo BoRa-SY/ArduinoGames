@@ -1,6 +1,9 @@
 #include <Arduino.h>
 
 #include "Pinout.h"
+
+#include "InputManager.h"
+
 namespace InputManager
 {
     void Init()

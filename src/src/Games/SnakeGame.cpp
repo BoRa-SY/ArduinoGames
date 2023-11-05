@@ -10,21 +10,18 @@
 
 #include "CoordinateSystem.h"
 
-
-
 namespace SnakeGame
 {
     bool gameOngoing = true;
 
-    const int speed = 100;
+    const int speed = 250;
 
-    const Size GridSize = {8,8};
+    const Size GridSize = MatrixDisplay::GridSize;
 
-    int snakeCellCount = 4;
+    int snakeCellCount;
     Point Snake[64];
-    
-    Point FoodPoint;
 
+    Point FoodPoint;
 
     char direction = 'r';
 
@@ -34,13 +31,13 @@ namespace SnakeGame
     {
         MatrixDisplay::Clear();
 
-        if(playerLost)
+        if (playerLost)
         {
-            MatrixDisplay::PlayAnimation(MatrixDisplay::DropdownFade);
+            MatrixDisplay::PlayAnimation(MatrixDisplay::DropdownFade, 2000);
             return;
         }
 
-        for(int i = 0; i < snakeCellCount; i++)
+        for (int i = 0; i < snakeCellCount; i++)
         {
             Point p = Snake[i];
             MatrixDisplay::SetPixel(p.X, p.Y, true);
@@ -49,16 +46,15 @@ namespace SnakeGame
         MatrixDisplay::SetPixel(FoodPoint.X, FoodPoint.Y, true);
     }
 
-
     void createFood()
     {
         Point food = {random(0, GridSize.Width), random(0, GridSize.Height)};
 
-        for(int i = 0; i < snakeCellCount; i++)
+        for (int i = 0; i < snakeCellCount; i++)
         {
             Point snakeCell = Snake[i];
 
-            if(snakeCell.X == food.X && snakeCell.Y == food.Y)
+            if (snakeCell.X == food.X && snakeCell.Y == food.Y)
             {
                 createFood();
                 return;
@@ -67,23 +63,6 @@ namespace SnakeGame
 
         FoodPoint = food;
     }
-
-    void Init()
-    {
-        Snake[0] = {3, 0};
-        Snake[1] = {2, 0};
-        Snake[2] = {1, 0};
-        Snake[3] = {0, 0};
-
-        createFood();
-
-        UpdateDisplay();
-
-        mainDelay.start(speed, AsyncDelay::MILLIS);
-
-    }
-
-
 
     bool IsInBounds(Point p)
     {
@@ -107,16 +86,13 @@ namespace SnakeGame
         }
     }
 
-
-
-
     inline void MainLogic()
     {
         Point offset = getOffsetByDirection(direction);
         Point head = Snake[0];
         Point newHead = {head.X + offset.X, head.Y + offset.Y};
 
-        if(!IsInBounds(newHead))
+        if (!IsInBounds(newHead))
         {
             gameOngoing = false;
             UpdateDisplay(true);
@@ -124,20 +100,19 @@ namespace SnakeGame
             return;
         }
 
-
-        
         Point lastCellPoint;
 
-        for(int i = snakeCellCount - 1; i > 0; i--)
+        for (int i = snakeCellCount - 1; i > 0; i--)
         {
             Snake[i] = Snake[i - 1];
 
-            if(i == snakeCellCount - 1) lastCellPoint = Snake[i];
+            if (i == snakeCellCount - 1)
+                lastCellPoint = Snake[i];
         }
 
         Snake[0] = newHead;
 
-        if(newHead.X == FoodPoint.X && newHead.Y == FoodPoint.Y)
+        if (newHead.X == FoodPoint.X && newHead.Y == FoodPoint.Y)
         {
             Snake[snakeCellCount] = lastCellPoint;
             snakeCellCount++;
@@ -149,15 +124,39 @@ namespace SnakeGame
 
     void Update()
     {
-        if(!gameOngoing) return;
+        if (!gameOngoing)
+            return;
         char drc = InputManager::GetPressedDirection();
-        if(drc != 'N') direction = drc;
+        if (drc != 'N')
+            direction = drc;
 
-        if (!mainDelay.isExpired()) return;
+        if (!mainDelay.isExpired())
+            return;
 
         MainLogic();
 
         mainDelay.start(speed, AsyncDelay::MILLIS);
     }
 
+    void StartGame()
+    {
+        snakeCellCount = 2;
+        Snake[0] = {1, 0};
+        Snake[1] = {0, 0};
+        direction = 'r';
+
+        createFood();
+
+        UpdateDisplay();
+
+        gameOngoing = true;
+
+        mainDelay.start(speed, AsyncDelay::MILLIS);
+
+        while (gameOngoing)
+        {
+            Update();
+            MatrixDisplay::Scan();
+        }
+    }
 }

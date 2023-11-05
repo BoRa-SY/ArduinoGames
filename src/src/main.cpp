@@ -8,17 +8,28 @@
 
 #include "Pinout.h"
 
-#include "SnakeGame.h"
+#include "Games\SnakeGame.h"
+#include "Games\MeteorGame.h"
+
+#include "MainMenu.h"
 
 void setup() {
   Serial.begin(9600);
   
   MatrixDisplay::Init();
   InputManager::Init();
-  SnakeGame::Init();
 }
 
 void loop() {
-  SnakeGame::Update();
-  MatrixDisplay::Scan();
+  int game = MainMenu::GetGameIndex();
+  
+  switch (game)
+  {
+    case 0:
+      SnakeGame::StartGame();
+      break;
+    case 1:
+      MeteorGame::StartGame();
+      break;
+  }
 }

@@ -9,4 +9,15 @@ namespace InputManager
     bool GetButtonState(uint8_t pin);
 
     char GetPressedDirection();
+
+
+    enum Direction
+    {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
+    };
+
+    bool GetDirection(Direction dir);
 }

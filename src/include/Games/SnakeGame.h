@@ -2,6 +2,5 @@
 
 namespace SnakeGame
 {
-    void Init();
-    void Update();
+    void StartGame();
 }

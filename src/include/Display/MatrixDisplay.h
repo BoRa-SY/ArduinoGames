@@ -1,7 +1,11 @@
 #pragma once
 
+#include "CoordinateSystem.h"
+
 namespace MatrixDisplay
 {
+
+    const Size GridSize = {8, 8};
 
     void Init();
 
@@ -20,5 +24,5 @@ namespace MatrixDisplay
         Countdown_3
     };
 
-    void PlayAnimation(Animations anim);
+    void PlayAnimation(Animations anim, int extraDelayMS = 0);
 }

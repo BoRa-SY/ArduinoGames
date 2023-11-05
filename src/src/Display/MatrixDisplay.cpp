@@ -77,11 +77,6 @@ namespace MatrixDisplay
 
 
     pic[Y] = value;
-
-    Serial.print("Y: ");
-    Serial.print(Y);
-    Serial.print("Val: ");
-    Serial.println(value);
   }
 
   inline void PlayDropdownFade()
@@ -98,9 +93,12 @@ namespace MatrixDisplay
     }
   }
 
+  AsyncDelay extraDelay;
 
-  void PlayAnimation(Animations anim)
+  void PlayAnimation(Animations anim, int extraDelayMS = 0)
   {
+    extraDelay.start(extraDelayMS, AsyncDelay::MILLIS);
+
     switch (anim)
     {
       
@@ -111,5 +109,8 @@ namespace MatrixDisplay
     default:
       break;
     }
+
+    while (!extraDelay.isExpired()) Scan();
+    
   }
 }
