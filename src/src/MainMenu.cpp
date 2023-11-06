@@ -5,98 +5,68 @@
 
 namespace MainMenu
 {
-    const unsigned int thumbnail_0[] =
+    const int thumbnailCount = 2;
+
+    const unsigned int thumbnails[2][8] =
     {
-        0b01011110,
-        0b00000000,
-        0b00000000
-    };
-
-    const unsigned int thumbnail_0_selected[] =
-    {
-        0b01011110,
-        0b00000000,
-        0b00111100
-    };
-
-
-    const unsigned int thumbnail_1[] =
-    {
-        0b00000000,
-        0b00000001,
-        0b10101011,
-        0b00000001
-    };
-
-    const unsigned int thumbnail_1_selected[] =
-    {
-        0b00111100,
-        0b00000001,
-        0b10101011,
-        0b00000001
-    };
-
-
-    int currentSelected = 0;
-
-
-    void DrawThumbnail(int thumbnailIndex, int startY, bool isSelected)
-    {
-        if(thumbnailIndex == 0) for(int i = 0; i < 3; i++)
         {
-            int line =  isSelected ? thumbnail_0_selected[i] : thumbnail_0[i];
-
-            
-            MatrixDisplay::SetLine(startY + i, line);
-        }
-        else if(thumbnailIndex == 1) for(int i = 0; i < 4; i++)
+            0b11111111,
+            0b11111111,
+            0b11000000,
+            0b11000000,
+            0b11000000,
+            0b00000000,
+            0b11000000,
+            0b11000000,
+        },
         {
-            int line =  isSelected ? thumbnail_1_selected[i] : thumbnail_1[i];
-
-            MatrixDisplay::SetLine(startY + i, line);
+            0b00000000,
+            0b00011000,
+            0b00011000,
+            0b00000000,
+            0b00011000,
+            0b00011000,
+            0b01111110,
+            0b01111110,
         }
-    }
+    };
 
-    void DrawSnake(bool selected)
-    {
-    }
 
-    void DrawMeteorGame(bool selected)
-    {
-    }
 
-    void Draw()
+    void Draw(int thumbnailIndex)
     {
         MatrixDisplay::Clear();
 
-        DrawThumbnail(0, 0, currentSelected == 0);
-        DrawThumbnail(1, 4, currentSelected == 1);
-        MatrixDisplay::SetLine(3, 255);
+        for(int i = 0; i<8; i++)
+        {
+            MatrixDisplay::SetLine(i, thumbnails[thumbnailIndex][i]);
+        }
+
     }
 
+    int currentSelected = 0;
     int GetGameIndex()
     {
-        Draw();
         while(true)
         {
             char dir = InputManager::GetPressedDirection();
             
-            if(dir == 'u')
+            if(dir == 'l')
             {
-                currentSelected = 0;
-                Draw();
-            }
-            else if (dir == 'd')
-            {
-                currentSelected = 1;
-                Draw();
+                if(currentSelected != 0)
+                currentSelected--;
+                else currentSelected = thumbnailCount - 1;
             }
             else if (dir == 'r')
             {
-                return currentSelected;
-            }
+                if(currentSelected != thumbnailCount - 1)
+                currentSelected++;
+                else currentSelected = 0;
+            } 
+            else if (dir == 'u' || dir == 'd') return currentSelected;
             
 
+            Draw(currentSelected);
             MatrixDisplay::Scan();
         }
     }
