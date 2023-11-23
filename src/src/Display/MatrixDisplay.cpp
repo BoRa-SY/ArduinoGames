@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "math.h"
 
 #include "AsyncDelay.h"
 
@@ -9,6 +10,8 @@ namespace MatrixDisplay
 {
 
   int pic[8];
+
+  const int heightFullBits = (int)pow(2, GridSize.Height - 1);
 
   void Clear(bool state = false)
   {
@@ -39,16 +42,26 @@ namespace MatrixDisplay
   }
 
 
+  String intToBinary(int num)
+  {
+    String binary;
+    while (num > 0)
+    {
+      binary = (num % 2 == 0 ? "0" : "1") + binary;
+      num /= 2;
+    }
+    return binary;
+  }
 
 
   void Scan()
   {
-
     for (int i = 0; i < 8; i++)
     {
       shiftOut(PIN_MatrixDATA, PIN_MatrixCLOCK, LSBFIRST, ~pic[i]);
-      shiftOut(PIN_MatrixDATA, PIN_MatrixCLOCK, LSBFIRST, 128 >> i);
+      shiftOut(PIN_MatrixDATA, PIN_MatrixCLOCK, LSBFIRST, heightFullBits >> i);
       TriggerLatch();
+      //delay(200);
     }
 
   }
@@ -60,11 +73,11 @@ namespace MatrixDisplay
 
     if (state)
     {
-      pic[Y] |= 1 << X;
+      pic[Y] |= 128 >> X;
     }
     else
     {
-      pic[Y] &= ~(1 << X);
+      pic[Y] &= ~(128 >> X);
     }
   }
 

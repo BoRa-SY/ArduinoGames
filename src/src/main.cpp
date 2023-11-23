@@ -21,6 +21,14 @@ void setup() {
 }
 
 void loop() {
+
+  for(int i = 0; i<8; i++)
+  {
+    MatrixDisplay::SetLine(i, 255);
+  }
+  MatrixDisplay::SetPixel(7,7, false);
+  MatrixDisplay::Scan();
+  return;
   int game = MainMenu::GetGameIndex();
   
   switch (game)

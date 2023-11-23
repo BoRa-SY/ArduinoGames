@@ -14,7 +14,7 @@ namespace SnakeGame
 {
     bool gameOngoing = true;
 
-    const int speed = 250;
+    const int speed = 700;
 
     const Size GridSize = MatrixDisplay::GridSize;
 
@@ -66,6 +66,7 @@ namespace SnakeGame
 
     bool IsInBounds(Point p)
     {
+        Serial.println(p.X);
         return p.X >= 0 && p.X < GridSize.Width && p.Y >= 0 && p.Y < GridSize.Height;
     }
 
